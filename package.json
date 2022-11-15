@@ -30,11 +30,13 @@
     "husky": "^7.0.0",
     "jest": "^27.5.1",
     "jest-extended": "^2.0.0",
+    "jest-sorted": "^1.0.14",
     "supertest": "^6.3.1"
   },
   "jest": {
     "setupFilesAfterEnv": [
-      "jest-extended/all"
+      "jest-extended/all",
+      "jest-sorted"
     ]
   }
 }
