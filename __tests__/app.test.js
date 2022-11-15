@@ -13,14 +13,21 @@ describe("/api/categories", () => {
       .get("/api/categories")
       .expect(200)
       .then((res) => {
-        expect(res.body.categories).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              slug: expect.any(String),
-              description: expect.any(String),
-            }),
-          ])
-        );
+        res.body.categories.forEach((category) => {
+          expect(category).toMatchObject({
+            slug: expect.any(String),
+            description: expect.any(String),
+          });
+        });
+      });
+  });
+
+  test("GET:404 sends an appropriate error message when given an invalid endpoint", () => {
+    return request(app)
+      .get("/not-an-endpoint")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Not Found");
       });
   });
 });
