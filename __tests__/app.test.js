@@ -33,12 +33,14 @@ describe("/api/categories", () => {
 });
 
 describe("/api/reviews", () => {
-  test("GET:200 sends an array of reviews to the client, sorted by ascending date ", () => {
+  test("GET:200 sends an array of reviews to the client, sorted by descending date ", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
       .then((res) => {
-        expect(res.body.reviews).toBeSortedBy("created_at");
+        expect(res.body.reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
 
         res.body.reviews.forEach((review) => {
           expect(review).toEqual({
