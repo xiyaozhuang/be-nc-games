@@ -20,3 +20,21 @@ exports.selectReviews = () => {
 
   return db.query(queryStr).then((result) => result.rows);
 };
+
+exports.selectReviewById = (review_id) => {
+  let queryStr = `
+    SELECT *
+    FROM reviews
+    WHERE review_id = $1
+  `;
+
+  return db.query(queryStr, [review_id]).then((result) => {
+    if (!result.rows[0]) {
+      return Promise.reject({
+        status: 404,
+        msg: "review does not exist",
+      });
+    }
+    return result.rows[0];
+  });
+};
