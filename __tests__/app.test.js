@@ -14,7 +14,7 @@ describe("/api/categories", () => {
       .expect(200)
       .then((res) => {
         res.body.categories.forEach((category) => {
-          expect(category).toEqual({
+          expect(category).toMatchObject({
             slug: expect.any(String),
             description: expect.any(String),
           });
@@ -43,7 +43,7 @@ describe("/api/reviews", () => {
         });
 
         res.body.reviews.forEach((review) => {
-          expect(review).toEqual({
+          expect(review).toMatchObject({
             owner: expect.any(String),
             title: expect.any(String),
             review_id: expect.any(Number),
@@ -65,7 +65,7 @@ describe("/api/reviews/:review_id", () => {
       .get("/api/reviews/1")
       .expect(200)
       .then((res) => {
-        expect(res.body.review).toEqual({
+        expect(res.body.review).toMatchObject({
           review_id: 1,
           title: expect.any(String),
           review_body: expect.any(String),
