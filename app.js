@@ -3,6 +3,7 @@ const { getCategories } = require("./controllers/categories.controllers");
 const {
   getReviews,
   getReviewById,
+  getCommentsByReviewId,
 } = require("./controllers/reviews.controllers");
 const {
   handleInvalidEndpoint,
@@ -20,6 +21,8 @@ app.get("/api/categories", getCategories);
 app.get("/api/reviews", getReviews);
 
 app.get("/api/reviews/:review_id", getReviewById);
+
+app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 
 app.use(handleInvalidEndpoint);
 app.use(handleCustomErrors);

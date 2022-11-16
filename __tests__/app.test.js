@@ -7,6 +7,17 @@ const data = require("../db/data/test-data");
 beforeEach(() => seed(data));
 afterAll(() => connection.end());
 
+describe("/api/not-an-endpoint", () => {
+  test("GET:404 sends an appropriate error message when given an invalid endpoint", () => {
+    return request(app)
+      .get("/not-an-endpoint")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Not Found");
+      });
+  });
+});
+
 describe("/api/categories", () => {
   test("GET:200 sends an array of categories to the client", () => {
     return request(app)
@@ -19,15 +30,6 @@ describe("/api/categories", () => {
             description: expect.any(String),
           });
         });
-      });
-  });
-
-  test("GET:404 sends an appropriate error message when given an invalid endpoint", () => {
-    return request(app)
-      .get("/not-an-endpoint")
-      .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("Not Found");
       });
   });
 });
@@ -91,6 +93,48 @@ describe("/api/reviews/:review_id", () => {
   test("GET:400 sends an appropriate error message when given an invalid id", () => {
     return request(app)
       .get("/api/reviews/not-a-review")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Id");
+      });
+  });
+});
+
+describe("/api/reviews/:review_id/comments", () => {
+  test("GET:200 sends an array of comments for a given review_id to the client", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comments).toBeSortedBy("created_at", {
+          descending: true,
+        });
+
+        res.body.comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            review_id: 2,
+          });
+        });
+      });
+  });
+
+  test("GET:404 sends an appropriate error message when given a valid but non-existent id", () => {
+    return request(app)
+      .get("/api/reviews/999/comments")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("review does not exist");
+      });
+  });
+
+  test("GET:400 sends an appropriate error message when given an invalid id", () => {
+    return request(app)
+      .get("/api/reviews/not-a-review/comments")
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Invalid Id");
