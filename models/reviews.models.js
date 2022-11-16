@@ -39,6 +39,32 @@ exports.selectReviewById = (review_id) => {
   });
 };
 
+exports.updateReviewById = ({ inc_votes }, review_id) => {
+  if (!inc_votes) {
+    return Promise.reject({
+      status: 400,
+      msg: `Bad Request`,
+    });
+  }
+
+  let queryStr = `
+    UPDATE reviews 
+    SET votes = votes + ${inc_votes}
+    WHERE review_id = ${review_id}
+    RETURNING *;     
+  `;
+
+  return db.query(queryStr).then((result) => {
+    if (!result.rows[0]) {
+      return Promise.reject({
+        status: 404,
+        msg: "review does not exist",
+      });
+    }
+    return result.rows[0];
+  });
+};
+
 exports.selectCommentsByReviewId = (review_id) => {
   let queryStr = `
     SELECT *
@@ -72,7 +98,7 @@ exports.insertComment = ({ username, body }, review_id) => {
     RETURNING *;
   `;
 
-  return db.query(queryStr, [body, username, review_id]).then((result) => {
-    return result.rows[0];
-  });
+  return db
+    .query(queryStr, [body, username, review_id])
+    .then((result) => result.rows[0]);
 };
