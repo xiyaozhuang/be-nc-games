@@ -163,7 +163,7 @@ describe("/api/reviews/:review_id/comments", () => {
       });
   });
 
-  test("POST:400 responds with an appropriate error message when provided with a bad comment", () => {
+  test("POST:400 responds with an appropriate error message when given a bad comment", () => {
     const newComment = {
       body: "testBody",
     };
@@ -174,6 +174,36 @@ describe("/api/reviews/:review_id/comments", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Bad Request");
+      });
+  });
+
+  test("POST:404 responds with an appropriate error message when given a valid but non-existent id", () => {
+    const newComment = {
+      username: "mallionaire",
+      body: "testBody",
+    };
+
+    return request(app)
+      .post("/api/reviews/999/comments")
+      .send(newComment)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Not Found");
+      });
+  });
+
+  test("POST:400 responds with an appropriate error message when given an invalid id", () => {
+    const newComment = {
+      username: "mallionaire",
+      body: "testBody",
+    };
+
+    return request(app)
+      .post("/api/reviews/not-a-review/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid Id");
       });
   });
 });
