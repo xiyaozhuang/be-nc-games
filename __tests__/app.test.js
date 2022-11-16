@@ -140,4 +140,40 @@ describe("/api/reviews/:review_id/comments", () => {
         expect(res.body.msg).toBe("Invalid Id");
       });
   });
+
+  test("POST:201 inserts a new comment to the db and sends the new comment back to the client", () => {
+    const newComment = {
+      username: "mallionaire",
+      body: "testBody",
+    };
+
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((res) => {
+        expect(res.body.comment).toMatchObject({
+          comment_id: expect.any(Number),
+          body: "testBody",
+          votes: 0,
+          author: "mallionaire",
+          review_id: 1,
+          created_at: expect.any(String),
+        });
+      });
+  });
+
+  test("POST:400 responds with an appropriate error message when provided with a bad comment", () => {
+    const newComment = {
+      body: "testBody",
+    };
+
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad Request");
+      });
+  });
 });
