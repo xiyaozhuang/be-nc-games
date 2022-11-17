@@ -92,19 +92,22 @@ describe("/api/reviews/:review_id", () => {
       const reviewVotesUpdate = {
         inc_votes: 1,
       };
+      const review_id = 1;
 
       return request(app)
-        .patch("/api/reviews/1")
+        .patch(`/api/reviews/${review_id}`)
         .send(reviewVotesUpdate)
         .expect(200)
         .then((res) => {
           expect(res.body.review).toMatchObject({
-            review_id: 1,
+            review_id: review_id,
             title: expect.any(String),
             review_body: expect.any(String),
             designer: expect.any(String),
             review_img_url: expect.any(String),
-            votes: expect.any(Number),
+            votes:
+              data.reviewData[review_id - 1].votes +
+              reviewVotesUpdate.inc_votes,
             category: expect.any(String),
             owner: expect.any(String),
             created_at: expect.any(String),
@@ -133,7 +136,9 @@ describe("/api/reviews/:review_id", () => {
     });
 
     test("PATCH:400 sends an appropriate error message when given a bad update", () => {
-      const reviewVotesUpdate = {};
+      const reviewVotesUpdate = {
+        inc_votes: "test",
+      };
 
       return request(app)
         .patch("/api/reviews/1")
