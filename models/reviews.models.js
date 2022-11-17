@@ -49,12 +49,12 @@ exports.updateReviewById = ({ inc_votes }, review_id) => {
 
   let queryStr = `
     UPDATE reviews 
-    SET votes = votes + ${inc_votes}
-    WHERE review_id = ${review_id}
+    SET votes = votes + $1
+    WHERE review_id = $2
     RETURNING *;     
   `;
 
-  return db.query(queryStr).then((result) => {
+  return db.query(queryStr, [inc_votes, review_id]).then((result) => {
     if (!result.rows[0]) {
       return Promise.reject({
         status: 404,
