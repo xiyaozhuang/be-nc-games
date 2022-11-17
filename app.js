@@ -7,6 +7,7 @@ const {
   getCommentsByReviewId,
   postComment,
 } = require("./controllers/reviews.controllers");
+const { getUsers } = require("./controllers/users.controllers");
 const {
   handleInvalidEndpoint,
   handleCustomErrors,
@@ -27,6 +28,8 @@ app.patch("/api/reviews/:review_id", patchReviewById);
 
 app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 app.post("/api/reviews/:review_id/comments", postComment);
+
+app.get("/api/users", getUsers);
 
 app.use(handleInvalidEndpoint);
 app.use(handleCustomErrors);
