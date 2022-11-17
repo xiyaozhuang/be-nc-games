@@ -40,7 +40,7 @@ exports.selectReviewById = (review_id) => {
 };
 
 exports.updateReviewById = ({ inc_votes }, review_id) => {
-  if (!inc_votes) {
+  if (!inc_votes || typeof inc_votes !== "number") {
     return Promise.reject({
       status: 400,
       msg: `Bad Request`,
