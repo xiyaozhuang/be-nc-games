@@ -27,6 +27,8 @@ describe("/api/categories", () => {
         .get("/api/categories")
         .expect(200)
         .then((res) => {
+          expect(res.body.categories.length).toBe(data.categoryData.length);
+
           res.body.categories.forEach((category) => {
             expect(category).toMatchObject({
               slug: expect.any(String),
@@ -45,6 +47,8 @@ describe("/api/reviews", () => {
         .get("/api/reviews")
         .expect(200)
         .then((res) => {
+          expect(res.body.reviews.length).toBe(data.reviewData.length);
+
           expect(res.body.reviews).toBeSortedBy("created_at", {
             descending: true,
           });
