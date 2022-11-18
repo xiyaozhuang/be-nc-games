@@ -7,7 +7,7 @@ const {
 } = require("../models/reviews.models");
 
 exports.getReviews = (req, res, next) => {
-  selectReviews()
+  selectReviews(req.query)
     .then((reviews) => {
       res.status(200).send({ reviews: reviews });
     })

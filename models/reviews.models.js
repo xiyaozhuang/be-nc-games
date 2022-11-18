@@ -1,6 +1,27 @@
 const db = require("../db/connection");
 
-exports.selectReviews = () => {
+const categoryWhitelist = {
+  "euro game": "euro game",
+  "social deduction": "social deduction",
+  dexterity: "dexterity",
+  "children's games": "children''s games",
+};
+const categoryWhitelistKeys = Object.keys(categoryWhitelist);
+const reviewWhitelist = {
+  owner: "reviews.owner",
+  category: "reviews.category",
+  title: "reviews.title",
+  review_id: "reviews.review_id",
+  category: "reviews.category",
+  review_img_url: "reviews.review_img_url",
+  created_at: "reviews.created_at",
+  votes: "reviews.votes",
+  designer: "reviews.designer",
+  comment_count: "comment_count",
+};
+const reviewWhitelistKeys = Object.keys(reviewWhitelist);
+
+exports.selectReviews = (query) => {
   let queryStr = `
     SELECT
       owner,
@@ -14,9 +35,46 @@ exports.selectReviews = () => {
       COUNT(comment_id) AS comment_count
     FROM reviews LEFT JOIN comments
     ON reviews.review_id = comments.review_id
-    GROUP BY reviews.review_id
-    ORDER BY reviews.created_at DESC;
   `;
+
+  if (query.category) {
+    if (!categoryWhitelistKeys.includes(query.category)) {
+      return Promise.reject({ status: 400, msg: "invalid category query" });
+    }
+
+    queryStr += `
+      WHERE category = '${categoryWhitelist[query.category]}'
+      GROUP BY reviews.review_id
+    `;
+  } else {
+    queryStr += `GROUP BY reviews.review_id`;
+  }
+
+  if (query.sort_by) {
+    if (!reviewWhitelistKeys.includes(query.sort_by)) {
+      return Promise.reject({ status: 400, msg: "invalid sort query" });
+    }
+
+    if (query.order) {
+      if (!["ASC", "DESC"].includes(query.order)) {
+        return Promise.reject({ status: 400, msg: "invalid order query" });
+      }
+
+      queryStr += `ORDER BY ${reviewWhitelist[query.sort_by]} ${query.order};`;
+    } else {
+      queryStr += ` ORDER BY ${reviewWhitelist[query.sort_by]} ASC;`;
+    }
+  } else {
+    if (query.order) {
+      if (!["ASC", "DESC"].includes(query.order)) {
+        return Promise.reject({ status: 400, msg: "invalid order query" });
+      }
+
+      queryStr += ` ORDER BY reviews.created_at ${query.order};`;
+    } else {
+      queryStr += ` ORDER BY reviews.created_at DESC;`;
+    }
+  }
 
   return db.query(queryStr).then((result) => result.rows);
 };
